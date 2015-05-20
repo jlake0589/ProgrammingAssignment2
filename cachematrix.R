@@ -3,22 +3,30 @@
 ## costly computation, in the event that the inverse of a given matrix
 ## has already been computed and cached
 
-## This function creates a matrix object that can cache its inverse
+## This function creates a matrix object that can cache its inverse.
+## This function creates a list containing functions to set and get
+## the value of the matrix as well as set and get the value of the 
+## inverse of the matrix
 
 makeCacheMatrix <- function(x = matrix()) {
+  
   m <- NULL
+  
   set <- function(y) {
     x <<- y
     m <<- NULL
   }
+  
   get <-function() x
-  setMean <- function(mean) m <<- mean
-  getMean <-function() m
-  list(set = set, ger = get,
-       setmean = setmean,
-       getmean = getmean)
+  
+  setInverse <- function(inverse) m <<- inverse
+  
+  getInverse <-function() m
+  
+  list(set = set, get = get,
+       setInverse = setInverse,
+       getInverse = getInverse)
 }
-
 
 ## This function computes the inverse of the matrix returned by the
 ## makeCacheMatrix function. If the matrix has not changed and the
@@ -26,5 +34,15 @@ makeCacheMatrix <- function(x = matrix()) {
 ## the inverse from the cache rather than re-compute the inverse
 
 cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
+  
+  m <- x$getInverse()
+  
+  if(!is.null(m)) {
+    message("getting cached data")
+    return(m)
+  }
+  data<- x$get()
+  m <- solve(data, ...)
+  x$setInverse(m)
+  m
 }
